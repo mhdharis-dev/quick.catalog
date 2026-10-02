@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuickCatalog – Digital catalog in one link</title>
+<meta name="description" content="Create a shareable product or service catalog stored entirely in a link. No database, no account.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site">
+  <a class="brand" href="#" id="brand"><span class="logo" aria-hidden="true"></span>QuickCatalog</a>
+  <button class="btn ghost" id="headerCreate" type="button">Create catalog</button>
+</header>
+
+<main>
+  <section id="landing" class="view" hidden>
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Create Your Digital Catalog</h1>
+        <p>Create a beautiful catalog for your business and share it with one simple link — no app, account, or database required.</p>
+        <button class="btn primary lg" id="heroCreate" type="button">Create Catalog</button>
+        <ul class="pills"><li>No Database</li><li>Free to Share</li><li>Works on Any Device</li></ul>
+      </div>
+      <div class="mock" aria-hidden="true">
+        <div class="mock-head"><i>M</i><b>Meera's Boutique</b></div>
+        <div class="mock-grid">
+          <div><span style="background:#e4e7ff"></span><b>Cotton Kurti</b><em>₹799</em></div>
+          <div><span style="background:#ffe6d9"></span><b>Silk Saree</b><em>₹2,499</em></div>
+          <div><span style="background:#dcf5e6"></span><b>Tailoring</b><em>₹350</em></div>
+          <div><span style="background:#fff2c9"></span><b>Dupatta</b><em>₹399</em></div>
+        </div>
+      </div>
+    </div>
+    <h2 class="how">How it works</h2>
+    <ol class="steps">
+      <li><b>Add your business</b><span>Name and contact details.</span></li>
+      <li><b>Add your products or services</b><span>A name, a price, and a photo if you like.</span></li>
+      <li><b>Generate your link</b><span>Your whole catalog lives inside the link.</span></li>
+      <li><b>Share it anywhere</b><span>WhatsApp, Instagram bio, or print it as a QR.</span></li>
+    </ol>
+  </section>
+
+  <section id="creator" class="view" hidden>
+    <div class="creator-grid">
+      <div class="stack">
+        <form class="card" id="bizForm" novalidate>
+          <h2><span class="num">1</span>Your business</h2>
+          <label for="bName">Business name <em>required</em></label>
+          <input id="bName" autocomplete="organization" placeholder="e.g. Meera's Boutique">
+          <div class="row2">
+            <div><label for="bWa">WhatsApp</label><input id="bWa" type="tel" inputmode="tel" placeholder="98765 43210"><small>Indian numbers work without +91.</small></div>
+            <div><label for="bPhone">Phone</label><input id="bPhone" type="tel" inputmode="tel" placeholder="98765 43210"></div>
+          </div>
+          <div class="row2">
+            <div><label for="bAddr">Address</label><input id="bAddr" autocomplete="street-address" placeholder="Town or street"></div>
+            <div><label for="bIg">Instagram</label><input id="bIg" placeholder="@yourbusiness"></div>
+          </div>
+        </form>
+
+        <div class="card" id="itemsCard">
+          <div class="card-head">
+            <h2><span class="num">2</span>What you sell</h2>
+            <fieldset class="seg">
+              <legend class="sr">Catalog type</legend>
+              <label><input type="radio" name="ctype" value="products" checked><span>Products</span></label>
+              <label><input type="radio" name="ctype" value="services"><span>Services</span></label>
+              <label><input type="radio" name="ctype" value="both"><span>Both</span></label>
+            </fieldset>
+          </div>
+          <div id="items" class="items"></div>
+          <button class="btn add" id="addBtn" type="button">+ Add Product / Service</button>
+          <p class="hint">Photos are shrunk and saved inside the link. A few small photos keep the link short.</p>
+        </div>
+      </div>
+
+      <aside class="preview-wrap" aria-label="Live preview">
+        <div class="preview-label">Live preview <button class="btn soft closeprev" id="closePrev" type="button">Close</button></div>
+        <div class="phone"><div id="preview"></div></div>
+      </aside>
+    </div>
+
+    <div class="bar">
+      <div id="errors" class="errors" role="alert" aria-live="assertive"></div>
+      <div class="bar-row">
+        <button class="btn soft prevbtn" id="prevBtn" type="button">Preview</button>
+        <button class="btn primary lg" id="genBtn" type="button">Generate Catalog Link</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="viewer" class="view" hidden><div id="catalog"></div></section>
+
+  <section id="invalid" class="view center" hidden>
+    <h1>Catalog unavailable</h1>
+    <p>Sorry, this catalog link is invalid or corrupted.</p>
+    <button class="btn primary lg" id="newBtn" type="button">Create a New Catalog</button>
+  </section>
+</main>
+
+<dialog id="modal" aria-labelledby="mTitle">
+  <h2 id="mTitle">Your catalog is ready!</h2>
+  <p class="hint">Share this link with customers. Keep it safe — the link holds your whole catalog.</p>
+  <textarea id="linkOut" readonly rows="3" aria-label="Catalog link"></textarea>
+  <p id="sizeNote" class="note" hidden></p>
+  <div class="modal-actions">
+    <button class="btn primary" id="copyBtn" type="button">Copy Link</button>
+    <button class="btn wa" id="shareBtn" type="button">Send on WhatsApp</button>
+    <button class="btn soft" id="openBtn" type="button">Open Catalog</button>
+    <button class="btn ghost" id="editBtn" type="button">Edit Catalog</button>
+  </div>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="script.js"></script>
+</body>
+</html>
