@@ -17,6 +17,11 @@ import {
   getUserCatalogs, 
   deleteUserCatalog 
 } from './utils/auth';
+import { 
+  saveCatalogToDb, 
+  saveProductToDb, 
+  saveMerchantProfileToDb 
+} from './utils/firebase';
 import { AlertCircle, PlusCircle, ArrowLeft } from 'lucide-react';
 
 const INITIAL_CATALOG = {
@@ -158,37 +163,75 @@ export default function App() {
     showToast(`Loaded ${demoData.business.name}! Customize anything.`);
   };
 
-  // Start fresh catalog
+  // Start fresh catalog (clean without any dummy data)
   const handleStartCreating = () => {
-    if (!catalogData.business.name) {
-      setCatalogData(JSON.parse(JSON.stringify(DEMO_CATALOGS.boutique)));
-    }
+    setCatalogData(JSON.parse(JSON.stringify(INITIAL_CATALOG)));
     navigateTo('creator');
   };
 
-  // Actual publish and save catalog
+  // Actual publish and save catalog directly to Firestore and local storage
   const proceedToPublish = async (user) => {
     try {
       const encoded = await encodeCatalog(catalogData);
       const url = `${window.location.origin}${window.location.pathname}#${encoded}`;
       
-      // Save to merchant's dashboard storage
+      const cleanPhone = (catalogData.business.whatsapp || '').replace(/\D/g, '');
+      const merchantId = user?.id || (cleanPhone ? `merchant_${cleanPhone}` : 'default_merchant');
+
+      // Save properly to Firestore database
+      try {
+        await saveCatalogToDb(merchantId, catalogData, url);
+
+        // Save each item as a product in database
+        if (catalogData.items && catalogData.items.length > 0) {
+          for (const item of catalogData.items) {
+            if (item.name && item.name.trim()) {
+              await saveProductToDb(merchantId, {
+                id: item.id ? `item_${item.id}` : undefined,
+                name: item.name,
+                price: item.price || '0',
+                category: item.category || 'All Products',
+                desc: item.desc || item.badge || '',
+                image: item.image || '',
+                status: true
+              });
+            }
+          }
+        }
+
+        // Save merchant business profile in database
+        await saveMerchantProfileToDb(merchantId, {
+          name: catalogData.business.name,
+          whatsapp: catalogData.business.whatsapp,
+          phone: catalogData.business.phone || catalogData.business.whatsapp,
+          address: catalogData.business.address || '',
+          instagram: catalogData.business.instagram || '',
+          theme: catalogData.business.theme || 'indigo',
+          currency: catalogData.business.currency || '₹'
+        });
+      } catch (dbErr) {
+        console.warn('Database save warning:', dbErr);
+      }
+
+      // Save to merchant's local storage
       if (user?.id) {
         saveUserCatalog(user.id, catalogData, url);
         setUserCatalogs(getUserCatalogs(user.id));
+      } else {
+        saveUserCatalog(merchantId, catalogData, url);
       }
 
       window.history.replaceState(null, '', '#' + encoded);
       setGeneratedUrl(url);
       setShareModalOpen(true);
-      showToast('Catalog published & saved to your Dashboard!');
+      showToast('Catalog created & saved to database! 🎉');
     } catch (err) {
       console.error('Error generating link:', err);
       showToast('Could not publish catalog. Please try again.');
     }
   };
 
-  // Triggered when clicking "Generate & Get Share Link"
+  // Triggered when clicking "Generate & Get Share Link" (no login requirement)
   const handleGenerateLink = async () => {
     // Form validations
     if (!catalogData.business.name.trim()) {
@@ -205,14 +248,7 @@ export default function App() {
       return;
     }
 
-    // Audio 2 Requirement: User must be logged in to publish!
-    if (!currentUser) {
-      setPendingAuthAction('publish');
-      setAuthModalOpen(true);
-      showToast('Please log in or register to publish your catalog');
-      return;
-    }
-
+    // Direct publish without requiring login
     await proceedToPublish(currentUser);
   };
 

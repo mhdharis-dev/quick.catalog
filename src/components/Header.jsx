@@ -33,46 +33,9 @@ export default function Header({
         </a>
 
         <div className="header-actions">
-          {/* Public customer viewer never sees dashboard or owner controls */}
+          {/* Public header: Login and Merchant Dashboard disabled/hidden for now */}
           {!isCustomerViewer && (
             <>
-              {currentUser ? (
-                <>
-                  <button 
-                    type="button" 
-                    className={`btn btn-sm ${isDashboardView ? 'btn-primary' : 'btn-ghost'}`}
-                    onClick={() => onNavigate('dashboard')}
-                  >
-                    <LayoutDashboard size={16} />
-                    <span>Merchant Dashboard</span>
-                  </button>
-
-                  <div className="header-user-pill">
-                    <span className="user-avatar-tiny">{currentUser.name ? currentUser.name[0].toUpperCase() : 'U'}</span>
-                    <span className="user-name-text">{currentUser.name}</span>
-                  </div>
-
-                  <button 
-                    type="button" 
-                    className="header-logout-btn"
-                    onClick={onLogout}
-                    title="Log out"
-                    aria-label="Log out"
-                  >
-                    <LogOut size={16} />
-                  </button>
-                </>
-              ) : (
-                <button 
-                  type="button" 
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => onOpenAuthModal('login')}
-                >
-                  <LogIn size={16} />
-                  <span>Log In</span>
-                </button>
-              )}
-
               {currentView === 'creator' ? (
                 <button 
                   type="button" 
@@ -82,7 +45,7 @@ export default function Header({
                   <ArrowLeft size={16} />
                   <span>Home</span>
                 </button>
-              ) : !isDashboardView && (
+              ) : (
                 <button 
                   type="button" 
                   className="btn btn-primary btn-sm"
